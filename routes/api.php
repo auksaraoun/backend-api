@@ -16,8 +16,8 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
-Route::post('login', [AuthController::class, 'login']);
-
+// Route::post('login', [AuthController::class, 'login']);
+Route::apiResource('/category', CategoryController::class);
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::apiResource('/category', CategoryController::class);
+    // Route::apiResource('/category', CategoryController::class);
 });

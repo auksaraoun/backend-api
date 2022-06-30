@@ -16,24 +16,33 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $per_page = $request->input('per_page', 50);
+        $per_page = $request->input('per_page');
         $sortBy = $request->input('sortBy', 'id');
         $sortDesc = $request->input('sortDesc', 'asc');
         $search = $request->input('search');
         $category_id = $request->input('category_id');
 
-        $categories = Category::select('categories.*');
+        $categories = Category::select('categories.*', 'main_categories.name as main_category_name')
+            ->leftJoin('categories as main_categories', 'main_categories.id', 'categories.category_id');
 
         if ($search) {
-            $categories->where(function ($query) {
-                $query->where('name', 'like', "%$search%");
+            $categories->where(function ($query) use ($search) {
+                $query->where('categories.name', 'like', "%$search%");
+                $query->where('main_categories.name', 'like', "%$search%");
             });
         }
 
         $categories->orderBy($sortBy, $sortDesc);
+
+        if ($per_page) {
+            $categories = $categories->paginate($per_page);
+        } else {
+            $categories = $categories->get();
+        }
         return response()->json([
             'status' => true,
-            'categories' => $categories->paginate($per_page)
+            'categories' => $categories,
+            'param' => $request->all()
         ], 200);
     }
 
@@ -54,7 +63,7 @@ class CategoryController extends Controller
                 'status' => false,
                 'message' => 'Validation fail',
                 'errors' => $validator->errors()
-            ], 401);
+            ], 422);
         }
 
         $category_id = $request->input('category_id');
@@ -65,14 +74,14 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Not found Category ID = ' . $category_id . ' in our system',
-            ], 401);
+            ], 422);
         }
 
         if ($main_category && $main_category->level == 3) {
             return response()->json([
                 'status' => false,
                 'message' => 'You can have 3 level category',
-            ], 401);
+            ], 422);
         }
 
         try {
@@ -126,25 +135,32 @@ class CategoryController extends Controller
                 'status' => false,
                 'message' => 'Validation fail',
                 'errors' => $validator->errors()
-            ], 401);
+            ], 422);
         }
 
         $category_id = $request->input('category_id');
 
         $main_category = Category::find($category_id);
 
+        if ($category_id == $id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'id and category_id cannot be the same',
+            ], 422);
+        }
+
         if ($category_id && !$main_category) {
             return response()->json([
                 'status' => false,
                 'message' => 'Not found Category ID = ' . $category_id . ' in our system',
-            ], 401);
+            ], 422);
         }
 
         if ($main_category && $main_category->level == 3) {
             return response()->json([
                 'status' => false,
                 'message' => 'You can have 3 level category',
-            ], 401);
+            ], 422);
         }
 
         try {
