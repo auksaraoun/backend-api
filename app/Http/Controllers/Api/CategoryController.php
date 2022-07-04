@@ -20,7 +20,6 @@ class CategoryController extends Controller
         $sortBy = $request->input('sortBy', 'id');
         $sortDesc = $request->input('sortDesc', 'asc');
         $search = $request->input('search');
-        $category_id = $request->input('category_id');
 
         $categories = Category::select('categories.*', 'main_categories.name as main_category_name')
             ->leftJoin('categories as main_categories', 'main_categories.id', 'categories.category_id');
@@ -42,7 +41,6 @@ class CategoryController extends Controller
         return response()->json([
             'status' => true,
             'categories' => $categories,
-            'param' => $request->all()
         ], 200);
     }
 
