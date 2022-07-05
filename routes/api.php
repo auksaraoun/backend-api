@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AdminGroupController;
 
 /*
@@ -22,6 +23,9 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', [AuthController::class, 'show']);
     Route::get('logout', [AuthController::class, 'logout']);
-    Route::apiResource('category', CategoryController::class);
+
+    Route::apiResource('admin', AdminController::class);
     Route::apiResource('admin-group', AdminGroupController::class);
+
+    Route::apiResource('category', CategoryController::class);
 });

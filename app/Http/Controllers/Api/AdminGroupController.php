@@ -120,7 +120,7 @@ class AdminGroupController extends Controller
             ]);
             return response()->json([
                 'status' => true,
-                'message' => 'Create Admin Group success',
+                'message' => 'Update Admin Group success',
                 'admin_group' => $admin_group
             ]);
         } catch (\Throwable $th) {
